@@ -1,33 +1,38 @@
 export default async function handler(req, res) {
+  // فقط درخواست POST از تلگرام قبول می‌کنیم
   if (req.method !== "POST") {
-    return res.status(200).send("Bot is running");
+    return res.status(200).send("Bot API is running");
   }
 
   try {
     const update = req.body;
 
-    const chat_id = update?.message?.chat?.id;
+    const chatId = update?.message?.chat?.id;
     const text = update?.message?.text;
 
-    if (!chat_id || !text) {
+    // اگر پیام نبود
+    if (!chatId || !text) {
       return res.status(200).send("no message");
     }
 
     const TOKEN = process.env.BOT_TOKEN;
 
+    // جواب دادن به تلگرام
     await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        chat_id: chat_id,
-        text: "تو گفتی: " + text
+        chat_id: chatId,
+        text: `👋 پیام شما: ${text}`
       })
     });
 
     return res.status(200).json({ ok: true });
 
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send("error");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("server error");
   }
-}
+      }
