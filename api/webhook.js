@@ -1,17 +1,21 @@
 export default async function handler(req, res) {
-  if (req.method === "POST") {
+  if (req.method !== "POST") {
+    return res.status(200).send("Bot is running");
+  }
+
+  try {
     const update = req.body;
 
-    // گرفتن پیام کاربر
-    const chat_id = update.message?.chat?.id;
-    const text = update.message?.text || "";
+    const chat_id = update?.message?.chat?.id;
+    const text = update?.message?.text;
 
-    if (!chat_id) {
+    if (!chat_id || !text) {
       return res.status(200).send("no message");
     }
 
-    // جواب دادن به تلگرام
-    await fetch(`https://api.telegram.org/botYOUR_TOKEN/sendMessage`, {
+    const TOKEN = process.env.BOT_TOKEN;
+
+    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -20,8 +24,10 @@ export default async function handler(req, res) {
       })
     });
 
-    return res.status(200).send("ok");
-  }
+    return res.status(200).json({ ok: true });
 
-  res.status(200).send("running");
-                }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("error");
+  }
+}
