@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       return res.status(200).send("no message");
     }
 
-    const TOKEN = process.env.BOT_TOKEN;
+    const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
     await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: "POST",
